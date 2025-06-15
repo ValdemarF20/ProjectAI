@@ -8,10 +8,19 @@ from pathlib import Path
 # Type: Instruction Tuned
 
 client = genai.Client(api_key="AIzaSyBxQbP2ukABclpD07OYAmHzBcNSIBfuGzc")
-model = "gemma-3-4b-it"
+model_4 = "gemma-3-4b-it"
+model_12 = "gemma-3-12b-it"
 prompt = "What 5 characters are shown in this CAPTCHA?  \
           Answer ONLY the string (5 characters)."
 delay = 2.5 # seconds between requests to avoid rate limiting
+
+def get_model_type(model: str):
+    if model == model_4:
+        return "4"
+    elif model == model_12:
+        return "12"
+    else:
+        return "-1"
 
 def get_img_accuracy(response_text: str, img_text: str) -> float:
     # Method must check for correct chars in exact positions
@@ -26,7 +35,7 @@ def get_img_accuracy(response_text: str, img_text: str) -> float:
             correct_chars += 1
     return correct_chars / 5
 
-def test_model(image: str):
+def check_model(model: str, image: str):
     file = client.files.upload(file=f"data/samples/{image}.png")
 
     response = client.models.generate_content(
@@ -46,11 +55,11 @@ def test_model(image: str):
         retries += 1
         if retries > 5:
             print("Failed to get a valid response after 5 retries. For image:", image)
-            with open("results.txt", "a") as f:
+            with open(f"results_{get_model_type(model)}.txt", "a") as f:
                 try:
                     f.write(f"{image};{response_text}-INVALID;0.0\n")
                 except Exception as e:
-                    print(f"Error writing to results.txt: {e} - response: {response_text}")
+                    print(f"Error writing to results_{get_model_type(model)}.txt: {e} - response: {response_text}")
                     errors += 1
                     if errors < 5:
                         continue # Try image again
@@ -61,45 +70,44 @@ def test_model(image: str):
 
     # Save result to results.txt
     while True:
-        with open("results.txt", "a") as f:
+        with open(f"results_{get_model_type(model)}.txt", "a") as f:
             try:
                 f.write(f"{image};{response.text};{accuracy}\n")
                 break
             except Exception as e:
-                print(f"Error writing to results.txt: {e} - response: {response_text}")
+                print(f"Error writing to results_{get_model_type(model)}.txt: {e} - response: {response_text}")
                 return image, "Invalid response", 0.0
 
     print(response.create_time)
 
     return image, response.text, accuracy
 
-def run_all_tests(files: list = Path("data/samples").iterdir()):
+def run_all(model: str, files: list = Path("data/samples").iterdir()):
     # Get images from data directory
     counter = 1
     for file in files:
         if file.is_file() and file.suffix == ".png":
             img_text = file.stem
-            print(f"Test {counter}: {test_model(img_text)}")
+            print(f"Check {counter}: {check_model(model, img_text)}")
             counter += 1
             time.sleep(delay)  # Sleep to avoid rate limiting
-    print("All tests completed.")
+    print("All checks completed.")
 
-def run_from_prev():
+def run_from_prev(model: str):
     # Read results from results.txt and print them
-    if not Path("results.txt").exists():
-        print("No previous results found.")
-        return
-
     missing = Path("data/samples").iterdir()
-    with open("results.txt", "r") as f:
-        lines = f.readlines()
-        prev_amount = len(lines)
-        print(f"Previous results found: {prev_amount} entries.")
-        # Remove already tested images from the list
-        for line in lines:
-            img_name = line.split(";")[0]
-            missing = [f for f in missing if f.stem != img_name]
-    run_all_tests(missing)
+    if not Path(f"results_{get_model_type(model)}.txt").exists():
+        print("No previous results found.")
+    else: # Don't run already checked images
+        with open(f"results_{get_model_type(model)}.txt", "r") as f:
+            lines = f.readlines()
+            prev_amount = len(lines)
+            print(f"Previous results found: {prev_amount} entries.")
+            # Remove already checked images from the list
+            for line in lines:
+                img_name = line.split(";")[0]
+                missing = [f for f in missing if f.stem != img_name]
+    run_all(model, missing)
 
-run_from_prev() # Continues from previous results
-#run_all_tests() # Ignores previous results
+run_from_prev(model_12) # Continues from previous results
+#run_all() # Ignores previous results
