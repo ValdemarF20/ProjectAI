@@ -66,7 +66,7 @@ def check_model(model: str, image: str, delay: bool = True):
     file = client.files.upload(file=f"data/samples/{image}.png")
 
     response = client.models.generate_content(
-        model=model, contents=[prompt_3, file]
+        model=model, contents=[prompt_2, file]
     )
     response_text = response.text
 
@@ -76,7 +76,7 @@ def check_model(model: str, image: str, delay: bool = True):
     while len(response_text) != 5:
         time.sleep(delay) # Sleep to avoid rate limiting
         response = client.models.generate_content(
-            model=model, contents=[prompt_3, file]
+            model=model, contents=[prompt_2, file]
         )
         response_text = response.text
         retries += 1
