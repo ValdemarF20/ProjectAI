@@ -496,7 +496,8 @@ d7nn3;fet7mn3-INVALID;0.0
 d8dce;odlce;0.4
 d8xcn;id8xen-INVALID;0.0
 dbex3;albe3;0.2
-dbfen;dbron;0.63eny7;3eny7;1.0
+dbfen;dbron;0.63
+3eny7;3eny7;1.0
 dbfen;dbron;0.6
 dbny3;dbmy3;0.8
 dbpcd;albcd;0.4
@@ -1027,10 +1028,3 @@ ygfwe;yagwe;0.6
 ymp7g;yimpdg-INVALID;0.0
 ypp8f;Aypbsf-INVALID;0.0
 ypw3d;xpn3d;0.6
-yw667;yW667;0.8
-yw7ny;YWLID;0.0
-ywn6f;WGF6F;0.2
-yx2d4;y x 2 0 4-INVALID;0.0
-yxd7m;yxdrm;0.8
-yyg5g;kvybs;0.0
-yyn57;RVD7-INVALID;0.0

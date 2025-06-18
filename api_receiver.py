@@ -8,7 +8,7 @@ import sys
 # Parameters: 4, 27 billion
 # Type: Instruction Tuned
 
-client = genai.Client(api_key="AIzaSyBxQbP2ukABclpD07OYAmHzBcNSIBfuGzc")
+client = genai.Client(api_key="AIzaSyBxQbP2ukABclpD07OYAmHzBcNSIBfuGzc") # The API key has been disabled for safety reasons.
 model_4 = "gemma-3-4b-it"
 model_27 = "gemma-3-27b-it"
 models = [model_4, model_27]

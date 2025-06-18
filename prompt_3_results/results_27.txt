@@ -812,7 +812,7 @@ nmw46;P1nMW46-INVALID;0.0
 nmy2x;aRmy2x-INVALID;0.0
 nn4wx;hAI4SWX-INVALID;0.0
 nn6mg;mn6itg-INVALID;0.0
-nnf8b;ñnf8b;0.8
+nnf8b;ï¿½nf8b;0.8
 nnfx3;A4ntX3-INVALID;0.0
 nngxc;YM0XC;0.0
 nnn57;AfnD7;0.4
@@ -1028,7 +1028,3 @@ yw667;Yw667;0.8
 yw7ny;YWL7BV-INVALID;0.0
 ywn6f;YWF6F;0.2
 yx2d4;AYX204-INVALID;0.0
-yxd7m;yxdim;0.8
-yy824;4V824;0.6
-yyg5g;4V050;0.2
-yyn57;PVl57;0.4

@@ -1028,8 +1028,3 @@ ypw3d;ypn3d;0.8
 yw667;yw667;1.0
 yw7ny;YWL7BY-INVALID;0.0
 ywn6f;YWF6F;0.2
-yx2d4;nyx2a;0.0
-yxd7m;yxd7m;1.0
-yy824;WV824;0.6
-yyg5g;4V08G;0.0
-yyn57;AV157;0.4

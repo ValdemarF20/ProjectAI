@@ -22,29 +22,29 @@ def comparison_mcnemar(model_4: pd.DataFrame, model_27: pd.DataFrame):
 
     return result.statistic, result.pvalue
 
-def comparison_edit_distance(model_4: pd.DataFrame, model_27: pd.DataFrame):
+def comparison_edit_distance(data_1: pd.DataFrame, data_2: pd.DataFrame):
     """
     Calculate the average edit distance between the response text and the image text for two models.
     Returns a tuple of average edit distances for both models.
     """
     # -- 1. Levenshtein distance for each row -----------------------------------
-    d4 = [distance(gt, pred) for gt, pred in
-          zip(model_4["image"].astype(str), model_4["response_text"].astype(str))]
-    d27 = [distance(gt, pred) for gt, pred in
-           zip(model_27["image"].astype(str), model_27["response_text"].astype(str))]
+    d1 = [distance(gt, pred) for gt, pred in
+          zip(data_1["image"].astype(str), data_1["response_text"].astype(str))]
+    d2 = [distance(gt, pred) for gt, pred in
+           zip(data_2["image"].astype(str), data_2["response_text"].astype(str))]
 
-    d4 = np.array(d4, dtype=int)
-    d27 = np.array(d27, dtype=int)
+    d1 = np.array(d1, dtype=int)
+    d2 = np.array(d2, dtype=int)
 
     # -- 2. Summary stats --------------------------------------------------------
-    mean4, mean27 = d4.mean(), d27.mean()
-    delta = mean27 - mean4
+    mean1, mean2 = d1.mean(), d2.mean()
+    delta = mean2 - mean1
 
     # -- 3. Paired Wilcoxon test -------------------------------------------------
-    stat, p = wilcoxon(d27, d4)
+    stat, p = wilcoxon(d2, d1)
 
     # -- 4. Output ---------------------------------------------------------------
-    return mean4, mean27, delta, stat, p
+    return mean1, mean2, delta, stat, p
 
 def generate_wilson(model: pd.DataFrame):
     """
@@ -64,33 +64,60 @@ def generate_wilson(model: pd.DataFrame):
 
     return lower_bound, upper_bound
 
-def generate(model_4: pd.DataFrame, model_27: pd.DataFrame):
+def generate(data_1: pd.DataFrame, data_2: pd.DataFrame):
     """ Generate a comparison statistics for different models based on their accuracy."""
     # -- 1. Calculate Wilson score intervals for both models --------------------
-    mcnemar_result = comparison_mcnemar(model_4, model_27)
+    mcnemar_result = comparison_mcnemar(data_1, data_2)
     print(f"McNemar's test statistic: {mcnemar_result[0]}, p-value: {mcnemar_result[1]}")
 
     # -- 2. Calculate Wilson score intervals for both models --------------------
-    edit_distance_result = comparison_edit_distance(model_4, model_27)
+    edit_distance_result = comparison_edit_distance(data_1, data_2)
     print(f"Edit-distance comparison (lower = better)")
-    print(f"  Model-4B  mean = {edit_distance_result[0]:.2f}")
-    print(f"  Model-27B mean = {edit_distance_result[1]:.2f}")
-    print(f"  Δ (27B − 4B)   = {edit_distance_result[2]:+.2f}")
+    print(f"  Data-1  mean = {edit_distance_result[0]:.2f}")
+    print(f"  Data-2  mean = {edit_distance_result[1]:.2f}")
+    print(f"  Δ (D1 − D2)   = {edit_distance_result[2]:+.2f}")
     print(f"  Wilcoxon  W = {edit_distance_result[3]:.0f},  p = {edit_distance_result[4]:.4g}")
 
     # -- 3. Calculate Wilson score intervals for both models --------------------
-    wilson_4 = generate_wilson(model_4)
-    wilson_27 = generate_wilson(model_27)
+    wilson_4 = generate_wilson(data_1)
+    wilson_27 = generate_wilson(data_2)
     print(f"Wilson score intervals:")
-    print(f"  Model-4B  = [{wilson_4[0]:.4f}, {wilson_4[1]:.4f}]")
-    print(f"  Model-27B = [{wilson_27[0]:.4f}, {wilson_27[1]:.4f}]")
+    print(f"  Data-1  = [{wilson_4[0]:.4f}, {wilson_4[1]:.4f}]")
+    print(f"  Data-2  = [{wilson_27[0]:.4f}, {wilson_27[1]:.4f}]")
 
+    captcha_completions_1 = data_1["response_text"].eq(data_1["image"]).sum()
+    captcha_completions_2 = data_2["response_text"].eq(data_2["image"]).sum()
+    print(f"Captcha completions:")
+    print(f"  Data-1  completions = {captcha_completions_1}")
+    print(f"  Data-2  completions = {captcha_completions_2}")
+
+    captcha_completion_ratio_1 = (captcha_completions_1 / len(data_1))
+    captcha_completion_ratio_2 = (captcha_completions_2 / len(data_2))
+    print(f"Captcha completion ratio:")
+    print(f"  Data-1  completion ratio = {captcha_completion_ratio_1:.4f}")
+    print(f"  Data-2  completion ratio = {captcha_completion_ratio_2:.4f}")
+
+def generate_prompts():
+    data1 = get_data_raw(model_27, prompt=1, depth=1)
+    data2 = get_data_raw(model_27, prompt=2, depth=1)
+    data3 = get_data_raw(model_27, prompt=3, depth=1)
+    print(f"Lengths of datasets: Data-1 = {len(data1)}, Data-2 = {len(data2)}, Data-3 = {len(data3)}")
+    print("=" * 50)
+    print("Generating comparison statistics for parameter 1 and 2")
+    generate(data1, data2)
+    print("=" * 50)
+    print("Generating comparison statistics for parameter 2 and 3")
+    generate(data2, data3)
+    print("=" * 50)
+    print("Generating comparison statistics for parameter 1 and 3")
+    generate(data1, data3)
+    print("=" * 50)
 
 if __name__ == '__main__':
-    model_4_data = get_data_raw(model_4, depth=1)
-    model_27_data = get_data_raw(model_27, depth=1)
-    print(f"Lengths of datasets: Model-4B = {len(model_4_data)}, Model-27B = {len(model_27_data)}")
-    generate(get_data(model_4, depth=1), get_data(model_27, depth=1))
+    data_1 = get_data(model_4, depth=1)
+    data_2 = get_data(model_27, depth=1)
+    print(f"Lengths of datasets: Data-1 = {len(data_1)}, Data-2 = {len(data_2)}")
+    generate(data_1, data_2)
 
 
 

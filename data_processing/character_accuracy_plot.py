@@ -1,12 +1,14 @@
 from data_loader import *
 
-def generate(data: pd.DataFrame):
+def generate(data: pd.DataFrame, with_n: bool = False):
     """
     Generate a plot showing the per-character accuracy of CAPTCHA responses.
     This accounts for character frequency in the ground truth.
     """
     # -------------- 1. Setup containers -----------------
     chars = get_chars(1)
+    if not with_n:
+        chars.remove("n")
     char_hits = {c: 0 for c in chars}  # correct predictions
     char_total = {c: 0 for c in chars}  # ground-truth appearances
 
@@ -57,10 +59,11 @@ def generate(data: pd.DataFrame):
     plt.ylim(0, 1.05)
     plt.grid(alpha=0.4, linestyle="--")
     plt.tight_layout()
-    plt.savefig(f"../plots/character_accuracy_plot_{model}.png")
+    with_n_suffix = "_with_n" if with_n else ""
+    plt.savefig(f"../plots/character_accuracy_plot_{model}{with_n_suffix}.png")
     plt.show()
 
 if __name__ == '__main__':
-    model = model_4  # Change this to the desired model
+    model = model_27  # Change this to the desired model
     print(f"Generating character accuracy plot for {model}")
-    generate(get_cleaned_data(model, depth=1))
+    generate(get_cleaned_data(model, depth=1), True)

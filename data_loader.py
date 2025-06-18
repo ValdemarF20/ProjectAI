@@ -1,5 +1,4 @@
 import string
-from collections import Counter
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,6 +20,9 @@ def get_data(model: str, prompt: int = -1, depth: int = 0) -> pd.DataFrame:
         for p in range(1, 4):
             with open(f"{path_fixer}prompt_{p}_results/results_{get_model_type(model)}.txt", "r") as f:
                 for line in f:
+                    if len(line.strip().split(";")) != 3:
+                        print(f"Skipping malformed line: {line.strip()}")
+                        continue
                     image, response_text, accuracy = line.strip().split(";")
                     data.loc[len(data)] = [image, response_text, float(accuracy)]
     else: # Load data for a specific prompt

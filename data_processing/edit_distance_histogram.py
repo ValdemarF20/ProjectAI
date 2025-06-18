@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 from data_loader import *
 
-def generate(data: pd.DataFrame):
+def generate(data: pd.DataFrame, model: str, prompt: int = -1):
     """
     Generate a plot showing the edit distance between the response text and the image text.
     """
@@ -25,10 +25,24 @@ def generate(data: pd.DataFrame):
     plt.ylabel("Number of CAPTCHAs")
     plt.title("Distribution of Edit Distances (Model vs Ground Truth)")
     plt.xticks(range(15))
-    plt.savefig(f"../plots/edit_distance_histogram_{model}.png")
+    prompt_str = f"_{prompt}" if prompt != -1 else ""
+    plt.savefig(f"../plots/edit_distance_histogram_{model}{prompt_str}.png")
     plt.show()
 
-if __name__ == '__main__':
-    model = model_27  # Change this to the desired model
+def generate_parameters(model: str):
+    data1 = get_data(model, prompt=1, depth=1)
+    data2 = get_data(model, prompt=2, depth=1)
+    data3 = get_data(model, prompt=3, depth=1)
+    print(f"Generating edit distance histogram for {model} with prompt 1")
+    generate(data1, model, 1)
+    print(f"Generating edit distance histogram for {model} with prompt 2")
+    generate(data2, model, 2)
+    print(f"Generating edit distance histogram for {model} with prompt 3")
+    generate(data3, model, 3)
+
+def generate_all(model: str):
     print(f"Generating edit distance histogram for {model}")
-    generate(get_data(model, depth=1))
+    generate(get_data(model, depth=1), model)
+
+if __name__ == '__main__':
+    generate_parameters(model_27)
