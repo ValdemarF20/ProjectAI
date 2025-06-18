@@ -87,8 +87,8 @@ def generate(model_4: pd.DataFrame, model_27: pd.DataFrame):
 
 
 if __name__ == '__main__':
-    model_4_data = get_data(model_4, depth=1)
-    model_27_data = get_data(model_27, depth=1)
+    model_4_data = get_data_raw(model_4, depth=1)
+    model_27_data = get_data_raw(model_27, depth=1)
     print(f"Lengths of datasets: Model-4B = {len(model_4_data)}, Model-27B = {len(model_27_data)}")
     generate(get_data(model_4, depth=1), get_data(model_27, depth=1))
 

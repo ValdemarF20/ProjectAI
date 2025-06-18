@@ -5,14 +5,13 @@ from pathlib import Path
 import sys
 
 # Model: Gemma 3 (Google)
-# Parameters: 4, 12, 27 billion
+# Parameters: 4, 27 billion
 # Type: Instruction Tuned
 
 client = genai.Client(api_key="AIzaSyBxQbP2ukABclpD07OYAmHzBcNSIBfuGzc")
 model_4 = "gemma-3-4b-it"
-model_12 = "gemma-3-12b-it"
 model_27 = "gemma-3-27b-it"
-models = [model_4, model_27] #[model_4, model_12, model_27] model_12 is currently overloaded and not available
+models = [model_4, model_27]
 # Baseline prompt:
 prompt_1 = "What 5 characters are shown in this CAPTCHA?  \
             Answer ONLY the string."
@@ -30,8 +29,6 @@ delay = 2.5 # seconds between requests to avoid rate limiting
 def get_model_type(model: str):
     if model == model_4:
         return "4"
-    elif model == model_12:
-        return "12"
     elif model == model_27:
         return "27"
     else:
@@ -40,8 +37,6 @@ def get_model_type(model: str):
 def get_model_from_type(model_type: str):
     if model_type == "4":
         return model_4
-    elif model_type == "12":
-        return model_12
     elif model_type == "27":
         return model_27
     elif model_type == "all":
@@ -66,7 +61,7 @@ def check_model(model: str, image: str, delay: bool = True):
     file = client.files.upload(file=f"data/samples/{image}.png")
 
     response = client.models.generate_content(
-        model=model, contents=[prompt_2, file]
+        model=model, contents=[prompt_1, file]
     )
     response_text = response.text
 
@@ -76,7 +71,7 @@ def check_model(model: str, image: str, delay: bool = True):
     while len(response_text) != 5:
         time.sleep(delay) # Sleep to avoid rate limiting
         response = client.models.generate_content(
-            model=model, contents=[prompt_2, file]
+            model=model, contents=[prompt_1, file]
         )
         response_text = response.text
         retries += 1

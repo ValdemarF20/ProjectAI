@@ -43,6 +43,15 @@ def get_cleaned_data(model: str, prompt: int = -1, depth: int = 0) -> pd.DataFra
 
     return data.reset_index(drop=True)
 
+def get_data_raw(model: str, prompt: int = -1, depth: int = 0) -> pd.DataFrame:
+    """
+    Load raw data from a specific model and prompt.
+    Removes "-INVALID" from the response_text but does not filter out entries.
+    """
+    data = get_data(model, prompt, depth)
+    # Remove all "-INVALID" from the entries but do not remove the entry itself
+    data["response_text"] = data["response_text"].str.replace("-INVALID", "", regex=False)
+    return data
 
 def analyze_data(data: pd.DataFrame):
     prev_len = len(data)

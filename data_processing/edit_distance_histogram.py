@@ -29,6 +29,6 @@ def generate(data: pd.DataFrame):
     plt.show()
 
 if __name__ == '__main__':
-    model = model_4  # Change this to the desired model
+    model = model_27  # Change this to the desired model
     print(f"Generating edit distance histogram for {model}")
     generate(get_data(model, depth=1))
